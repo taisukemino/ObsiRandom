@@ -1,0 +1,20 @@
+{
+  "name": "obsirandom",
+  "version": "1.0.0",
+  "description": "An Obsidian plugin",
+  "main": "main.js",
+  "scripts": {
+    "dev": "bun run build.ts",
+    "build": "NODE_ENV=production bun run build.ts",
+    "clean": "rm -f main.js"
+  },
+  "keywords": [],
+  "author": "Tai",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0"
+  }
+}
