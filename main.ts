@@ -20,7 +20,9 @@ const DEFAULT_SETTINGS: ObsiRandomSettings = {
 };
 
 const TIME_PERIODS = {
+  DAY: 1,
   WEEK: 7,
+  TWO_WEEKS: 14,
   MONTH: 30,
   YEAR: 365
 } as const;
@@ -41,8 +43,16 @@ export default class ObsiRandomPlugin extends Plugin {
     return markdownFiles.filter((file) => file.stat.ctime >= cutoffTime);
   }
 
+  private getNotesFromPastDay(): TFile[] {
+    return this.getNotesFromPastDays(TIME_PERIODS.DAY);
+  }
+
   private getNotesFromPastWeek(): TFile[] {
     return this.getNotesFromPastDays(TIME_PERIODS.WEEK);
+  }
+
+  private getNotesFromPastTwoWeeks(): TFile[] {
+    return this.getNotesFromPastDays(TIME_PERIODS.TWO_WEEKS);
   }
 
   private getNotesFromPastMonth(): TFile[] {
@@ -98,10 +108,24 @@ export default class ObsiRandomPlugin extends Plugin {
     );
   }
 
+  private async openRandomNoteFromDay(): Promise<void> {
+    await this.executeRandomNoteCommand(
+      () => this.getNotesFromPastDay(),
+      "from the past 24 hours"
+    );
+  }
+
   private async openRandomRecentNote(): Promise<void> {
     await this.executeRandomNoteCommand(
       () => this.getNotesFromPastWeek(),
       "from the past 7 days"
+    );
+  }
+
+  private async openRandomNoteFromTwoWeeks(): Promise<void> {
+    await this.executeRandomNoteCommand(
+      () => this.getNotesFromPastTwoWeeks(),
+      "from the past two weeks"
     );
   }
 
@@ -186,9 +210,19 @@ export default class ObsiRandomPlugin extends Plugin {
         callback: () => this.openRandomNoteFromVault()
       },
       {
+        id: "open-random-day-note",
+        name: "Random note from past 24 hours",
+        callback: () => this.openRandomNoteFromDay()
+      },
+      {
         id: "open-random-recent-note",
         name: "Random note from past 7 days",
         callback: () => this.openRandomRecentNote()
+      },
+      {
+        id: "open-random-two-weeks-note",
+        name: "Random note from past two weeks",
+        callback: () => this.openRandomNoteFromTwoWeeks()
       },
       {
         id: "open-random-month-note",
@@ -303,7 +337,9 @@ class ObsiRandomSettingTab extends PluginSettingTab {
     // Built-in commands
     const builtInCommands = [
       "Random note from vault",
+      "Random note from past 24 hours",
       "Random note from past 7 days",
+      "Random note from past two weeks",
       "Random note from past month",
       "Random note from past year"
     ];
