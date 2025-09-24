@@ -1,7 +1,7 @@
 {
   "id": "obsirandom",
   "name": "ObsiRandom",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "0.15.0",
   "description": "Open random notes from your vault, specific time periods, or custom directories",
   "author": "Tai",
