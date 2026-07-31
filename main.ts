@@ -150,7 +150,7 @@ export default class ObsiRandomPlugin extends Plugin {
 
     if (!directoryPath.trim()) {
       new Notice(
-        `Please set Custom Directory ${directoryNumber} in plugin settings first!`
+        `Please set custom directory ${directoryNumber} in plugin settings first!`
       );
       return;
     }
@@ -167,36 +167,26 @@ export default class ObsiRandomPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
-  private removeCustomCommands(): void {
-    [1, 2, 3].forEach((num) => {
-      const commandId = `${this.manifest.id}:open-random-custom-directory-${num}`;
-      // @ts-ignore - accessing private property
-      if (this.app.commands.commands[commandId]) {
-        // @ts-ignore - accessing private property
-        this.app.commands.removeCommand(commandId);
-      }
-    });
-  }
+  private registerCustomDirectoryCommands(): void {
+    const directoryNumbers: Array<1 | 2 | 3> = [1, 2, 3];
 
-  private addCustomCommands(): void {
-    [1, 2, 3].forEach((num) => {
-      const directoryPath =
-        this.settings[`customDirectory${num}` as keyof ObsiRandomSettings];
-      if (directoryPath.trim()) {
-        this.addCommand({
-          id: `open-random-custom-directory-${num}`,
-          name: `Random note from ${directoryPath}`,
-          callback: () => {
-            this.openRandomNoteFromCustomDirectory(num as 1 | 2 | 3);
+    directoryNumbers.forEach((directoryNumber) => {
+      this.addCommand({
+        id: `open-random-custom-directory-${directoryNumber}`,
+        name: `Random note from custom directory ${directoryNumber}`,
+        // Reason: checkCallback hides the command from the palette when the
+        // directory is not configured, so no private command-removal API is needed.
+        checkCallback: (checking) => {
+          const directoryPath =
+            this.settings[`customDirectory${directoryNumber}`];
+          if (!directoryPath.trim()) return false;
+          if (!checking) {
+            this.openRandomNoteFromCustomDirectory(directoryNumber);
           }
-        });
-      }
+          return true;
+        }
+      });
     });
-  }
-
-  public updateCommands(): void {
-    this.removeCustomCommands();
-    this.addCustomCommands();
   }
 
   async onload() {
@@ -239,8 +229,9 @@ export default class ObsiRandomPlugin extends Plugin {
     // Register built-in commands
     builtInCommands.forEach((cmd) => this.addCommand(cmd));
 
-    // Add dynamic custom directory commands
-    this.updateCommands();
+    // Custom directory commands are always registered; checkCallback hides
+    // them until the corresponding directory setting is configured.
+    this.registerCustomDirectoryCommands();
 
     // Add settings tab
     this.addSettingTab(new ObsiRandomSettingTab(this.app, this));
@@ -283,7 +274,7 @@ class ObsiRandomSettingTab extends PluginSettingTab {
     const settingKey = `customDirectory${num}` as keyof ObsiRandomSettings;
 
     new Setting(containerEl)
-      .setName(`Custom Directory ${num}`)
+      .setName(`Custom directory ${num}`)
       .setDesc(`Select or enter directory path ${num}`)
       .addDropdown((dropdown) => {
         dropdown.addOption("", "-- Select a directory --");
@@ -294,7 +285,6 @@ class ObsiRandomSettingTab extends PluginSettingTab {
         dropdown.onChange(async (value) => {
           this.plugin.settings[settingKey] = value;
           await this.plugin.saveSettings();
-          this.plugin.updateCommands();
         });
       })
       .addText((text) =>
@@ -304,7 +294,6 @@ class ObsiRandomSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings[settingKey] = value;
             await this.plugin.saveSettings();
-            this.plugin.updateCommands();
           })
       );
   }
@@ -314,16 +303,12 @@ class ObsiRandomSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    // Header
-    containerEl.createEl("h2", { text: "ObsiRandom Settings" });
-
     containerEl.createEl("p", {
       text: "Configure custom directories to quickly access random notes from specific folders in your vault.",
       cls: "setting-item-description"
     });
 
-    // Available Commands Section (moved to top)
-    containerEl.createEl("h3", { text: "Available Commands" });
+    new Setting(containerEl).setName("Available commands").setHeading();
 
     containerEl.createEl("p", {
       text: "Use the command palette (Ctrl/Cmd + P) to access these commands:",
@@ -361,11 +346,7 @@ class ObsiRandomSettingTab extends PluginSettingTab {
       }
     });
 
-    // Divider
-    containerEl.createEl("hr", { cls: "setting-item-description" });
-
-    // Custom Directories Section (moved to bottom)
-    containerEl.createEl("h3", { text: "Custom Directories" });
+    new Setting(containerEl).setName("Custom directories").setHeading();
 
     const directories = this.getAllDirectories();
 

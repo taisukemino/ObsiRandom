@@ -1,7 +1,7 @@
 {
   "name": "obsirandom",
-  "version": "1.0.0",
-  "description": "An Obsidian plugin",
+  "version": "0.0.1",
+  "description": "Open random notes from your vault, specific time periods, or custom directories.",
   "main": "main.js",
   "scripts": {
     "dev": "bun run build.ts",
