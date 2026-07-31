@@ -1,5 +1,5 @@
 {
-  "name": "obsirandom",
+  "name": "random-note-plus",
   "version": "0.0.1",
   "description": "Open random notes from your vault, specific time periods, or custom directories.",
   "main": "main.js",

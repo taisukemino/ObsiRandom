@@ -7,13 +7,13 @@ import {
   Notice
 } from "obsidian";
 
-interface ObsiRandomSettings {
+interface RandomNotePlusSettings {
   customDirectory1: string;
   customDirectory2: string;
   customDirectory3: string;
 }
 
-const DEFAULT_SETTINGS: ObsiRandomSettings = {
+const DEFAULT_SETTINGS: RandomNotePlusSettings = {
   customDirectory1: "",
   customDirectory2: "",
   customDirectory3: ""
@@ -29,8 +29,8 @@ const TIME_PERIODS = {
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
-export default class ObsiRandomPlugin extends Plugin {
-  settings: ObsiRandomSettings;
+export default class RandomNotePlusPlugin extends Plugin {
+  settings: RandomNotePlusSettings;
 
   private getAllNotes(): TFile[] {
     return this.app.vault.getMarkdownFiles();
@@ -87,7 +87,7 @@ export default class ObsiRandomPlugin extends Plugin {
         await this.app.workspace.getLeaf().openFile(randomNote);
         new Notice(`Opened random note: ${randomNote.basename}`);
       } catch (error) {
-        console.error("ObsiRandom: Failed to open note:", error);
+        console.error("Random Note+: Failed to open note:", error);
         new Notice(`Failed to open note: ${randomNote.basename}`);
       }
     }
@@ -234,16 +234,16 @@ export default class ObsiRandomPlugin extends Plugin {
     this.registerCustomDirectoryCommands();
 
     // Add settings tab
-    this.addSettingTab(new ObsiRandomSettingTab(this.app, this));
+    this.addSettingTab(new RandomNotePlusSettingTab(this.app, this));
   }
 
   onunload() {}
 }
 
-class ObsiRandomSettingTab extends PluginSettingTab {
-  plugin: ObsiRandomPlugin;
+class RandomNotePlusSettingTab extends PluginSettingTab {
+  plugin: RandomNotePlusPlugin;
 
-  constructor(app: App, plugin: ObsiRandomPlugin) {
+  constructor(app: App, plugin: RandomNotePlusPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -271,7 +271,7 @@ class ObsiRandomSettingTab extends PluginSettingTab {
     num: 1 | 2 | 3,
     directories: string[]
   ): void {
-    const settingKey = `customDirectory${num}` as keyof ObsiRandomSettings;
+    const settingKey = `customDirectory${num}` as keyof RandomNotePlusSettings;
 
     new Setting(containerEl)
       .setName(`Custom directory ${num}`)
@@ -337,7 +337,7 @@ class ObsiRandomSettingTab extends PluginSettingTab {
     [1, 2, 3].forEach((num) => {
       const directoryPath =
         this.plugin.settings[
-          `customDirectory${num}` as keyof ObsiRandomSettings
+          `customDirectory${num}` as keyof RandomNotePlusSettings
         ];
       if (directoryPath.trim()) {
         commandList.createEl("li", {

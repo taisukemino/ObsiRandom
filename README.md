@@ -1,4 +1,4 @@
-# ObsiRandom
+# Random Note+
 
 An Obsidian plugin that opens random notes from your vault — from the whole vault, from recent time periods, or from custom directories.
 
@@ -16,20 +16,20 @@ Open the command palette (Ctrl/Cmd + P) and search for "Random":
 
 ## Settings
 
-In Settings → Community plugins → ObsiRandom, you can configure up to 3 custom directories. Pick a folder from the dropdown or type a path manually.
+In Settings → Community plugins → Random Note+, you can configure up to 3 custom directories. Pick a folder from the dropdown or type a path manually.
 
 ## Installation
 
 ### From the community plugin directory
 
 1. Open Settings → Community plugins → Browse
-2. Search for "ObsiRandom"
+2. Search for "Random Note+"
 3. Install and enable the plugin
 
 ### Manual installation
 
-1. Download `main.js` and `manifest.json` from the [latest release](https://github.com/taisukemino/ObsiRandom/releases/latest)
-2. Copy them into `<your-vault>/.obsidian/plugins/obsirandom/`
+1. Download `main.js` and `manifest.json` from the [latest release](https://github.com/taisukemino/random-note-obsidian/releases/latest)
+2. Copy them into `<your-vault>/.obsidian/plugins/random-note-plus/`
 3. Reload Obsidian and enable the plugin in Settings → Community plugins
 
 ## Requirements
