@@ -6,10 +6,10 @@ An Obsidian plugin that opens random notes from your vault — from recent time 
 
 Open the command palette (Ctrl/Cmd + P) and search for "Random":
 
-- **Random note from \<folder name\>** — notes from a folder you configure (up to 3; each command appears once its directory is set in the plugin settings, named after the folder)
-- **Random note from past 24 hours** — notes created in the last day
-- **Random note from past 7 days** — notes created in the last week
+- **Random note from past day** — notes created in the last 24 hours
+- **Random note from past week** — notes created in the last 7 days
 - **Random note from past month** — notes created in the last 30 days
+- **Random note from \<folder name\>** — notes from a folder you configure (up to 3; each command appears once its directory is set in the plugin settings, named after the folder)
 
 ## Settings
 

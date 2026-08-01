@@ -126,24 +126,27 @@ export default class RandomNotePickerPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
 
-    // Built-in commands configuration
+    // Built-in commands configuration.
+    // Reason: the command palette ranks equal fuzzy matches by name length
+    // (shorter first), so names are chosen with ascending lengths to display
+    // as: past day, past week, past month, then custom directories.
     const builtInCommands = [
       {
         id: "open-random-day-note",
-        name: "Random note from past 24 hours",
+        name: "Random note from past day",
         callback: () =>
           void this.openRandomNoteFromPastDays(
             TIME_PERIODS.DAY,
-            "from the past 24 hours"
+            "from the past day"
           )
       },
       {
         id: "open-random-recent-note",
-        name: "Random note from past 7 days",
+        name: "Random note from past week",
         callback: () =>
           void this.openRandomNoteFromPastDays(
             TIME_PERIODS.WEEK,
-            "from the past 7 days"
+            "from the past week"
           )
       },
       {
@@ -157,13 +160,12 @@ export default class RandomNotePickerPlugin extends Plugin {
       }
     ];
 
-    // Custom directory commands are registered first so they appear at the
-    // top of the command palette; checkCallback hides them until the
-    // corresponding directory setting is configured.
-    this.registerCustomDirectoryCommands();
-
     // Register built-in commands
     builtInCommands.forEach((cmd) => this.addCommand(cmd));
+
+    // Custom directory commands are hidden by checkCallback until the
+    // corresponding directory setting is configured.
+    this.registerCustomDirectoryCommands();
 
     // Add settings tab
     this.addSettingTab(new RandomNotePickerSettingTab(this.app, this));
