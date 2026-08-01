@@ -1,26 +1,19 @@
-// @ts-ignore - bun types not available
 import { build } from "bun";
 
-try {
-  // @ts-ignore - top-level await
-  await build({
-    entrypoints: ["./main.ts"],
-    outdir: ".",
-    outfile: "main.js",
-    target: "node",
-    format: "cjs",
-    external: ["obsidian"],
-    minify: process.env.NODE_ENV === "production",
-    sourcemap: process.env.NODE_ENV === "production" ? "none" : "inline",
-    define: {
-      "process.env.NODE_ENV": JSON.stringify(
-        process.env.NODE_ENV || "development"
-      )
-    }
-  });
+const nodeEnvironment = Bun.env.NODE_ENV || "development";
+const isProductionBuild = nodeEnvironment === "production";
 
-  console.log("✅ Build completed successfully");
-} catch (error) {
-  console.error("❌ Build failed:", error);
-  process.exit(1);
-}
+// Reason: Bun.build throws on failure by default, which prints the errors
+// and exits non-zero — no try/catch or success logging needed.
+await build({
+  entrypoints: ["./main.ts"],
+  outdir: ".",
+  target: "node",
+  format: "cjs",
+  external: ["obsidian"],
+  minify: isProductionBuild,
+  sourcemap: isProductionBuild ? "none" : "inline",
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(nodeEnvironment)
+  }
+});
