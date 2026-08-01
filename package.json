@@ -1,7 +1,7 @@
 {
   "name": "random-note-picker",
-  "version": "0.0.2",
-  "description": "Open random notes from your vault, specific time periods, or custom directories.",
+  "version": "0.0.3",
+  "description": "Open random notes from custom directories or recent time periods.",
   "main": "main.js",
   "scripts": {
     "dev": "bun run build.ts",

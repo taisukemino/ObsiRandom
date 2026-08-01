@@ -11,19 +11,13 @@ import { RandomNotePickerSettingTab } from "./settings-tab";
 const TIME_PERIODS = {
   DAY: 1,
   WEEK: 7,
-  TWO_WEEKS: 14,
-  MONTH: 30,
-  YEAR: 365
+  MONTH: 30
 } as const;
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export default class RandomNotePickerPlugin extends Plugin {
   settings: RandomNotePickerSettings;
-
-  private getAllNotes(): TFile[] {
-    return this.app.vault.getMarkdownFiles();
-  }
 
   private getNotesFromPastDays(days: number): TFile[] {
     const cutoffTime = Date.now() - days * MILLISECONDS_PER_DAY;
@@ -69,10 +63,6 @@ export default class RandomNotePickerPlugin extends Plugin {
     await this.openRandomNote(this.getNotesFromPastDays(days), context);
   }
 
-  private async openRandomNoteFromVault(): Promise<void> {
-    await this.openRandomNote(this.getAllNotes(), "in the vault");
-  }
-
   private async openRandomNoteFromCustomDirectory(
     directoryNumber: CustomDirectoryNumber
   ): Promise<void> {
@@ -98,13 +88,26 @@ export default class RandomNotePickerPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+    // Reason: command names include the configured directory name, so they
+    // must be refreshed whenever the settings change. Re-adding a command
+    // with the same id replaces the previous registration.
+    this.registerCustomDirectoryCommands();
+  }
+
+  private getCustomDirectoryName(
+    directoryNumber: CustomDirectoryNumber
+  ): string {
+    const directoryPath =
+      this.settings[getCustomDirectoryKey(directoryNumber)].trim();
+    const directoryName = directoryPath.split("/").pop();
+    return directoryName || `custom directory ${directoryNumber}`;
   }
 
   private registerCustomDirectoryCommands(): void {
     CUSTOM_DIRECTORY_NUMBERS.forEach((directoryNumber) => {
       this.addCommand({
         id: `open-random-custom-directory-${directoryNumber}`,
-        name: `Random note from custom directory ${directoryNumber}`,
+        name: `Random note from ${this.getCustomDirectoryName(directoryNumber)}`,
         // Reason: checkCallback hides the command from the palette when the
         // directory is not configured, so no private command-removal API is needed.
         checkCallback: (checking) => {
@@ -126,11 +129,6 @@ export default class RandomNotePickerPlugin extends Plugin {
     // Built-in commands configuration
     const builtInCommands = [
       {
-        id: "open-random-note",
-        name: "Random note from vault",
-        callback: () => void this.openRandomNoteFromVault()
-      },
-      {
         id: "open-random-day-note",
         name: "Random note from past 24 hours",
         callback: () =>
@@ -149,15 +147,6 @@ export default class RandomNotePickerPlugin extends Plugin {
           )
       },
       {
-        id: "open-random-two-weeks-note",
-        name: "Random note from past two weeks",
-        callback: () =>
-          void this.openRandomNoteFromPastDays(
-            TIME_PERIODS.TWO_WEEKS,
-            "from the past two weeks"
-          )
-      },
-      {
         id: "open-random-month-note",
         name: "Random note from past month",
         callback: () =>
@@ -165,24 +154,16 @@ export default class RandomNotePickerPlugin extends Plugin {
             TIME_PERIODS.MONTH,
             "from the past month"
           )
-      },
-      {
-        id: "open-random-year-note",
-        name: "Random note from past year",
-        callback: () =>
-          void this.openRandomNoteFromPastDays(
-            TIME_PERIODS.YEAR,
-            "from the past year"
-          )
       }
     ];
 
+    // Custom directory commands are registered first so they appear at the
+    // top of the command palette; checkCallback hides them until the
+    // corresponding directory setting is configured.
+    this.registerCustomDirectoryCommands();
+
     // Register built-in commands
     builtInCommands.forEach((cmd) => this.addCommand(cmd));
-
-    // Custom directory commands are always registered; checkCallback hides
-    // them until the corresponding directory setting is configured.
-    this.registerCustomDirectoryCommands();
 
     // Add settings tab
     this.addSettingTab(new RandomNotePickerSettingTab(this.app, this));

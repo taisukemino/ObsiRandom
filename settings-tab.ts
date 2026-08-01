@@ -26,7 +26,7 @@ export class RandomNotePickerSettingTab extends PluginSettingTab {
   getSettingDefinitions(): SettingDefinitionItem[] {
     return CUSTOM_DIRECTORY_NUMBERS.map((directoryNumber) => ({
       name: `Custom directory ${directoryNumber}`,
-      desc: `Folder used by the "Random note from custom directory ${directoryNumber}" command.`,
+      desc: `Adds a "Random note from <folder name>" command for the selected folder.`,
       control: {
         type: "folder",
         key: getCustomDirectoryKey(directoryNumber),
