@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "random-note-plus",
+      "name": "random-note-picker",
       "devDependencies": {
         "@types/node": "^20.0.0",
         "obsidian": "latest",
